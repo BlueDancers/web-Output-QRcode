@@ -12,8 +12,6 @@
   <body>
     <!-- 用于生成载体 -->
     <canvas width="260" height="310" id="canvas"></canvas>
-    <!-- 用于预览 -->
-    <img id="img" />
   </body>
 
   <script>
@@ -41,9 +39,19 @@
           if (xhr.status == 200) {
             var data = new Uint8Array(xhr.response);
             var workbook = XLSX.read(data, { type: "array" });
+
+            // 获取实际表格长度（去除表头）
+            let carryLen = 0;
+            for (const key in workbook.Sheets["Sheet"]) {
+              const ele = workbook.Sheets["Sheet"][key];
+              if (key.includes("A")) {
+                carryLen++;
+              }
+            }
+            // 解析数据
             let xls = [];
-            for (let i = 2; i <= 51; i++) {
-              let data = workbook.Sheets["卡密明细"];
+            for (let i = 2; i <= carryLen; i++) {
+              let data = workbook.Sheets["Sheet"];
               xls.push({
                 key: data["A" + i].w,
                 value: data["B" + i].w,
@@ -58,7 +66,6 @@
     // 实际生成逻辑
     function createImg(xls, index) {
       new Promise((resolve, reject) => {
-        console.log(xls);
         // 生成二维码
         QRCode.toDataURL(
           xls[index].key,
@@ -100,20 +107,11 @@
         .then(() => {
           // 用于预览
           let url = document.getElementById("canvas").toDataURL("image/png");
-          document
-            .getElementById("img")
-            .setAttribute(
-              "src",
-              document.getElementById("canvas").toDataURL("image/png")
-            );
-
           var a = document.createElement("a"); // 生成一个a元素
           var event = new MouseEvent("click"); // 创建一个单击事件
           a.download = xls[index].value; // 将a的download属性设置为我们想要下载的图片名称，若name不存在则使用‘下载图片名称’作为默认名称
           a.href = url; // 将生成的URL设置为a.href属性
-          if (index == 41) {
-            a.dispatchEvent(event); // 触发a的单击事件
-          }
+          a.dispatchEvent(event); // 触发a的单击事件
         })
         .then(() => {
           setTimeout(() => {
@@ -122,7 +120,7 @@
               ctx.fillRect(0, 0, 260, 310);
               createImg(xls, index + 1);
             }
-          }, 20);
+          }, 40);
         });
     }
   </script>
