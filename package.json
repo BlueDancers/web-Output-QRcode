@@ -1,0 +1,26 @@
+{
+  "name": "web-output-qrcode",
+  "version": "1.0.0",
+  "description": "一次普通的技术需求会议",
+  "main": "qrcode.js",
+  "scripts": {
+    "build": "node index",
+    "test": "node index -a"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vkcyan/web-Output-QRcode.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vkcyan/web-Output-QRcode/issues"
+  },
+  "homepage": "https://github.com/vkcyan/web-Output-QRcode#readme",
+  "dependencies": {
+    "canvas": "^2.11.0",
+    "minimist": "^1.2.7",
+    "node-xlsx": "^0.21.0",
+    "qrcode": "^1.5.1"
+  }
+}
