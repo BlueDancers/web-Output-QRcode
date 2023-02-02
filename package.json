@@ -2,7 +2,7 @@
   "name": "web-output-qrcode",
   "version": "1.0.0",
   "description": "一次普通的技术需求会议",
-  "main": "qrcode.js",
+  "main": "index.js",
   "scripts": {
     "build": "node index",
     "test": "node index -a"

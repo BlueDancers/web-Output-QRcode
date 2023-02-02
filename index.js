@@ -3,34 +3,41 @@ const { createCanvas, loadImage } = require('canvas')
 const fs = require('fs')
 const QRCode = require('QRCode')
 const minimist = require('minimist')
+const { config, imageType } = require('./config')
+
 let logo = null
+let suffix = '.png'
 
 init()
 async function init() {
-  let xlsxList = xlsx.parse('./xls.xls')
+  let xlsxList = xlsx.parse(config.filePath)
   await isLogo()
+  // 判断导出图片的后缀
+  if (config.exportType) {
+    suffix = imageType[config.exportType] || '.png'
+  }
+
   // 解析执行命令参数选项
   let argv = minimist(process.argv.slice(2))
-
+  console.log(argv, 'argv')
+  let total = 0
   if (!argv.a) {
-    let total = xlsxList[0].data.length - 1
-    for (let i = 1; i <= total; i++) {
-      console.log(`${xlsxList[0].data[i][1]}开始绘制 ${i}/${total}`)
-      let buffer = await getCodeImg(
-        xlsxList[0].data[i][0],
-        xlsxList[0].data[i][1]
-      )
-      fs.writeFileSync(`./image/${xlsxList[0].data[i][1]}.png`, buffer)
-    }
+    total = xlsxList[0].data.length - 1
   } else {
-    console.log(`${xlsxList[0].data[1][1]}开始绘制`)
-    let buffer = await getCodeImg(
-      xlsxList[0].data[1][0],
-      xlsxList[0].data[1][1]
-    )
-    fs.writeFileSync(`./image/${xlsxList[0].data[1][1]}.png`, buffer)
+    total = 1
   }
-  console.log('绘制完了')
+  for (let i = 1; i <= total; i++) {
+    console.log(`${xlsxList[0].data[i][1]}开始绘制 ${i}/${total}`)
+    let buffer = await getCodeImg(
+      xlsxList[0].data[i][0],
+      xlsxList[0].data[i][1]
+    )
+    fs.writeFileSync(
+      `${config.exportPath}${xlsxList[0].data[i][1]}${suffix}`,
+      buffer
+    )
+  }
+  console.log('绘制完成!')
 }
 
 /**
@@ -52,7 +59,7 @@ async function getCodeImg(codeUrl, index) {
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText(index, 130, 270)
-  buffer = canvas.toBuffer('image/png')
+  buffer = canvas.toBuffer(config.exportType)
   return buffer
 }
 
@@ -81,9 +88,9 @@ function getCode(codeUrl) {
  */
 function isLogo() {
   return new Promise((resolve, reject) => {
-    fs.access('./logo.jpeg', async (err) => {
+    fs.access(config.logoPath, async (err) => {
       if (err == null) {
-        logo = await loadImage('./logo.jpeg')
+        logo = await loadImage(config.logoPath)
         resolve(true)
       } else {
         resolve(false)
