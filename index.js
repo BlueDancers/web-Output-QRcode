@@ -19,7 +19,6 @@ async function init() {
 
   // 解析执行命令参数选项
   let argv = minimist(process.argv.slice(2))
-  console.log(argv, 'argv')
   let total = 0
   if (!argv.a) {
     total = xlsxList[0].data.length - 1
